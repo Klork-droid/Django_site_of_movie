@@ -1,6 +1,8 @@
 from django.db import models
 from datetime import date
 
+from django.urls import reverse
+
 
 class Category(models.Model):
     """Категория"""
@@ -50,7 +52,7 @@ class Movie(models.Model):
     title = models.CharField('Название', max_length=100)
     tagline = models.CharField('Слоган', max_length=100, default='')
     description = models.TextField('Описание')
-    poster = models.ImageField('Постер', upload_to='movies/')
+    poster = models.ImageField('Постер', upload_to='movie/')
     year = models.PositiveSmallIntegerField('Дата выхода', default=2019)
     country = models.CharField('Страна', max_length=30)
     directors = models.ManyToManyField(Actor, verbose_name='Режиссер', related_name='film_director')
@@ -72,6 +74,9 @@ class Movie(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('movie_detail', kwargs={'slug': self.url})
 
     class Meta:
         verbose_name = 'Фильм'
@@ -109,7 +114,7 @@ class Rating(models.Model):
     """Рейтинг"""
     ip = models.CharField('IP адресс', max_length=15)
     star = models.ForeignKey(RatingStar, on_delete=models.CASCADE, verbose_name='звезда')
-    movie = models.ForeignKey(Movie, on_delete=models.CharField, verbose_name='фильм')
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, verbose_name='фильм')
 
     def __str__(self):
         return f'{self.star} - {self.movie}'
@@ -135,4 +140,3 @@ class Reviews(models.Model):
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
-
